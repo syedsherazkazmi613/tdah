@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+  <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+    href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" />
+
+  <title>Services de Coaching TDAH</title>
+  <link rel="shortcut icon" href="/img/tdh.png" type="image/x-icon">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <!-- Add AOS CSS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+   <div class="relative flex min-h-screen w-full flex-col bg-[#fcfaf8] group/design-root overflow-x-hidden"
+    style='font-family: Manrope, "Noto Sans", sans-serif;'>
+    <div class="flex h-full grow flex-col">
+      <nav class="bg-white shadow relative z-50">
+        <div class="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex">
+              <div class="flex-shrink-0 flex items-center">
+                <img class="h-24 w-auto" src="/img/tdh.png" alt="Logo" data-aos="fade-right">
+              </div>
+            </div>
+            <div class="flex items-center">
+              <!-- Bouton menu mobile -->
+              <button type="button" id="mobile-menu-button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100" aria-controls="mobile-menu" aria-expanded="false">
+                <span class="sr-only">Ouvrir le menu principal</span>
+                <!-- Menu ouvert: "hidden", Menu fermé: "block" -->
+                <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <!-- Navigation bureau -->
+              <div class="hidden md:ml-6 md:flex md:space-x-8" data-aos="fade-left">
+                <a href="/" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">Accueil</a>
+                <a href="/about" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">À propos</a>
+                <a href="/services" class="text-[#f48225] px-3 py-2 text-sm font-medium">Services</a>
+                <a href="/ebooks" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">E-books</a>
+                <a href="/contact" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">Contact</a>
+              </div>
+            </div>
+            <!-- Navigation authentification -->
+            <div id="auth-nav" class="hidden md:flex items-center ml-4" data-aos="fade-left">
+              <!-- Sera rempli par JavaScript -->
+              <div class="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu mobile -->
+        <div class="md:hidden" id="mobile-menu" style="display: none; opacity: 0; transform: translateY(-20px);">
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="/" class="block px-3 py-2 text-base font-medium text-gray-700 bg-gray-50">Accueil</a>
+            <a href="/about" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">À propos</a>
+            <a href="/services" class="block text-[#f48225] px-3 py-2 text-base font-medium hover:text-gray-900 hover:bg-gray-50">Services</a>
+            <a href="/ebooks" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">E-books</a>
+            <a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Contact</a>
+          </div>
+          <!-- Navigation authentification mobile -->
+          <div id="mobile-auth-nav" class="px-2 pt-2 pb-3 border-t border-gray-200">
+            <!-- Sera rempli par JavaScript -->
+            <div class="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+          </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        <script>
+          // Initialize AOS
+          AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+          });
+
+          const menuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          let isMenuOpen = false;
+
+          menuButton.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            
+            if (isMenuOpen) {
+              // Afficher menu
+              mobileMenu.style.display = 'block';
+              gsap.to(mobileMenu, {
+                opacity: 1,
+                y: 0,
+                duration: 0.3,
+                ease: 'power2.out'
+              });
+            } else {
+              // Cacher menu
+              gsap.to(mobileMenu, {
+                opacity: 0,
+                y: -20,
+                duration: 0.3,
+                ease: 'power2.in',
+                onComplete: () => {
+                  mobileMenu.style.display = 'none';
+                }
+              });
+            }
+          });
+
+          // Récupérer le statut d'authentification et mettre à jour la navigation
+          fetch('/api/user')
+            .then(response => response.json())
+            .then(data => {
+              const authNav = document.getElementById('auth-nav');
+              const mobileAuthNav = document.getElementById('mobile-auth-nav');
+              
+              if (data.isAuthenticated) {
+                // Utilisateur connecté - Bureau
+                authNav.innerHTML = `
+                  <div class="flex items-center">
+                    <div class="relative" id="profile-dropdown-container" style="position: fixed; top: 1rem; right: 1rem;">
+                      <button id="profile-dropdown-button" class="flex items-center focus:outline-none">
+                        <img src="${data.profileImage}" alt="Profil" class="w-8 h-8 rounded-full border-2 border-blue-500">
+                        <span class="ml-2 text-sm font-medium text-gray-700">${data.name}</span>
+                        <svg class="ml-1 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </button>
+                      
+                    <div id="profile-dropdown-menu" class="fixed mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999] hidden">
+                        <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Votre Profil</a>
+                        <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Se déconnecter</a>
+                      </div>
+                    </div>
+                  </div>
+                `;
+
+                // Utilisateur connecté - Mobile
+                mobileAuthNav.innerHTML = `
+                  <div class="space-y-1">
+                    <span class="block px-3 py-2 text-base font-medium text-gray-700">${data.name}</span>
+                    <a href="/profile" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Votre Profil</a>
+                    <a href="/logout" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Se déconnecter</a>
+                  </div>
+                `;
+                
+                // Ajouter un écouteur d'événements pour basculer le menu déroulant
+                const dropdownButton = document.getElementById('profile-dropdown-button');
+                const dropdownMenu = document.getElementById('profile-dropdown-menu');
+                
+                dropdownButton.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  dropdownMenu.classList.toggle('hidden');
+                });
+                
+                // Fermer le menu déroulant en cliquant à l'extérieur
+                document.addEventListener('click', () => {
+                  dropdownMenu.classList.add('hidden');
+                });
+              } else {
+                // Utilisateur non connecté - Bureau
+                authNav.innerHTML = `
+                  <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-sm font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                    <a href="/register" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                      S'inscrire
+                    </a>
+                  </div>
+                `;
+
+                // Utilisateur non connecté - Mobile
+                mobileAuthNav.innerHTML = `
+                  <div class="space-y-1">
+                    <a href="/login" class="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                    <a href="/register" class="block px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">S'inscrire</a>
+                  </div>
+                `;
+              }
+            })
+            .catch(error => {
+              console.error('Erreur lors de la récupération des données utilisateur:', error);
+              // Retour aux liens de connexion/inscription - Bureau
+              document.getElementById('auth-nav').innerHTML = `
+                <div class="flex items-center space-x-4">
+                  <a href="/login" class="text-sm font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                  <a href="/register" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                    S'inscrire
+                  </a>
+                </div>
+              `;
+
+              // Retour aux liens de connexion/inscription - Mobile
+              document.getElementById('mobile-auth-nav').innerHTML = `
+                <div class="space-y-1">
+                  <a href="/login" class="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                  <a href="/register" class="block px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">S'inscrire</a>
+                </div>
+              `;
+            });
+        </script>
+      </nav>
+      <div class="px-4 md:px-8 lg:px-16 xl:px-24 2xl:px-32 flex flex-1 justify-center py-5">
+        <div class="flex flex-col w-full max-w-[2000px] flex-1">
+          <div class="@container">
+            <div class="p-2 md:p-4">
+              <div class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 rounded-xl items-start justify-end px-4 pb-10 @[480px]:px-10"
+                style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://cdn.usegalileo.ai/sdxl10/5d1060e7-48ab-4d36-9aea-514a711f3011.png");'
+                data-aos="fade-up">
+                <div class="flex flex-col gap-2 text-left">
+                  <h1 class="text-white text-3xl md:text-4xl lg:text-5xl font-black leading-tight tracking-[-0.033em]">
+                    Nos Services de Coaching TDAH
+                  </h1>
+                  <h2 class="text-white text-sm md:text-base font-normal leading-normal">
+                    Accompagnement expert et soutien pour les parents d'enfants TDAH
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h2 class="text-[#1c140d] text-xl md:text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5" data-aos="fade-right">Formules Coaching</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+            <div class="flex flex-1 gap-3 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4 flex-col" data-aos="fade-up" data-aos-delay="100">
+              <div class="text-[#1c140d]" data-icon="Clock" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path>
+                </svg>
+              </div>
+              <div class="flex flex-col gap-1">
+                <h2 class="text-[#1c140d] text-base font-bold leading-tight">Formule Simple</h2>
+                <p class="text-[#9c6f49] text-sm font-normal leading-normal">3h : 150€ | 6h : 280€ | 9h : 400€</p>
+              </div>
+            </div>
+
+            <div class="flex flex-1 gap-3 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4 flex-col" data-aos="fade-up" data-aos-delay="200">
+              <div class="text-[#1c140d]" data-icon="Star" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M239.2,97.29a16,16,0,0,0-13.81-11L166,81.17,142.72,25.81h0a15.95,15.95,0,0,0-29.44,0L90.07,81.17,30.61,86.31a16,16,0,0,0-9.11,28.07L66.61,153.8,53.09,212.34a16,16,0,0,0,23.84,17.34l51-31,51.11,31a16,16,0,0,0,23.84-17.34l-13.51-58.6,45.1-39.36A16,16,0,0,0,239.2,97.29Zm-15.22,5-45.1,39.36a16,16,0,0,0-5.08,15.71L187.35,216v0l-51.07-31a15.9,15.9,0,0,0-16.54,0l-51,31h0L82.2,157.4a16,16,0,0,0-5.08-15.71L32,102.35a.37.37,0,0,1,0-.09l59.44-5.14a16,16,0,0,0,13.35-9.75L128,32.08l23.2,55.29a16,16,0,0,0,13.35,9.75L224,102.26S224,102.32,224,102.33Z"></path>
+                </svg>
+              </div>
+              <div class="flex flex-col gap-1">
+                <h2 class="text-[#1c140d] text-base font-bold leading-tight">Formule Complète</h2>
+                <p class="text-[#9c6f49] text-sm font-normal leading-normal">3h + CR : 220€ | 6h + CR : 420€ | 9h + CR : 600€</p>
+              </div>
+            </div>
+
+            <div class="flex flex-1 gap-3 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4 flex-col" data-aos="fade-up" data-aos-delay="300">
+              <div class="text-[#1c140d]" data-icon="Users" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"></path>
+                </svg>
+              </div>
+              <div class="flex flex-col gap-1">
+                <h2 class="text-[#1c140d] text-base font-bold leading-tight">Formule Parents Séparés</h2>
+                <p class="text-[#9c6f49] text-sm font-normal leading-normal">2 séances individuelles + 1 commune : 150€</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-center px-4 py-3">
+            <div class="flex items-center gap-2 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4" data-aos="fade-up">
+              <div class="text-[#1c140d]" data-icon="Gift" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M216,72H180.92c.39-.33.77-.67,1.14-1A26,26,0,0,0,145.19,34.1a38.37,38.37,0,0,0-17.11,14.78c-1.44,2.32-2.54,4.12-3.33,5.39a45.84,45.84,0,0,0-3.27-5.32A38.36,38.36,0,0,0,104.31,34.1,26,26,0,0,0,67.44,71c.37.33.75.67,1.14,1H40A16,16,0,0,0,24,88v32a16,16,0,0,0,16,16v64a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V136a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72ZM148,48a10,10,0,0,1,7.07,17.07,33.49,33.49,0,0,1-23.52,9.84,4,4,0,0,1-3.41-1.92c-.66-1.13-1.52-2.62-2.5-4.39A22.68,22.68,0,0,1,136.9,50.8,10,10,0,0,1,148,48ZM100.93,48A10,10,0,0,1,112,50.8a22.68,22.68,0,0,1,11.26,17.8c-1,1.77-1.84,3.26-2.5,4.39a4,4,0,0,1-3.41,1.92A33.49,33.49,0,0,1,93.83,65.07,10,10,0,0,1,100.93,48ZM40,88H120v32H40ZM56,200V136h64v64Zm144,0H136V136h64Zm16-80H136V88h80Z"></path>
+                </svg>
+              </div>
+              <p class="text-[#1c140d] text-sm font-medium">Pour tout achat d'une formule, recevez un e-book gratuit !</p>
+            </div>
+          </div>
+          <div class="flex justify-stretch">
+            <div class="flex flex-1 gap-3 flex-wrap px-4 py-3 justify-start">
+              <a href="/#pricing"
+                class="flex min-w-[84px] max-w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f48225] text-[#1c140d] text-sm font-bold leading-normal tracking-[0.015em]" data-aos="fade-up">
+                <span class="truncate">Réservez Votre Première Séance Aujourd'hui !</span>
+              </a>
+            </div>
+          </div>
+
+
+          <h2 class="text-[#1c140d] text-xl md:text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5" data-aos="fade-right">Fonctionnalités
+            Supplémentaires</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+            <div class="flex flex-1 gap-3 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4 flex-col" data-aos="fade-up" data-aos-delay="100">
+              <div class="text-[#1c140d]" data-icon="Users" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
+                  viewBox="0 0 256 256">
+                  <path
+                    d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z">
+                  </path>
+                </svg>
+              </div>
+              <div class="flex flex-col gap-1">
+                <h2 class="text-[#1c140d] text-base font-bold leading-tight">Sessions En Ligne & Par Téléphone</h2>
+                <p class="text-[#9c6f49] text-sm font-normal leading-normal">Options de coaching flexibles adaptées à votre emploi du temps et vos préférences.</p>
+              </div>
+            </div>
+            <div class="flex flex-1 gap-3 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4 flex-col" data-aos="fade-up" data-aos-delay="200">
+              <div class="text-[#1c140d]" data-icon="Calendar" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
+                  viewBox="0 0 256 256">
+                  <path
+                    d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z">
+                  </path>
+                </svg>
+              </div>
+              <div class="flex flex-col gap-1">
+                <h2 class="text-[#1c140d] text-base font-bold leading-tight">Plans Personnalisés</h2>
+                <p class="text-[#9c6f49] text-sm font-normal leading-normal">Plans de coaching adaptés aux besoins uniques de votre famille.</p>
+              </div>
+            </div>
+            <div class="flex flex-1 gap-3 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4 flex-col" data-aos="fade-up" data-aos-delay="300">
+            <div class="flex flex-1 gap-3 rounded-lg border border-[#e8dace] bg-[#fcfaf8] p-4 flex-col">
+              <div class="text-[#1c140d]" data-icon="Book" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24ZM72,40H200V184H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40Z"></path>
+                </svg>
+              </div>
+              <div class="flex flex-col gap-1">
+                <h2 class="text-[#1c140d] text-base font-bold leading-tight">E-book Gratuit</h2>
+                <p class="text-[#9c6f49] text-sm font-normal leading-normal">Un e-book offert pour tout achat d'une formule de coaching.</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-stretch">
+            <div class="flex flex-1 gap-3 flex-wrap px-4 py-3 justify-start">
+              <a href="/#pricing"
+                class="flex min-w-[84px] max-w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f48225] text-[#1c140d] text-sm font-bold leading-normal tracking-[0.015em]">
+                <span class="truncate">Réservez Votre Première Séance Aujourd'hui !</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="bg-gray-100 mt-12 py-12 w-full">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Liens Rapides -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Liens Rapides</h3>
+          <ul class="space-y-2">
+            <li><a href="/" class="text-gray-600 hover:text-blue-600">Accueil</a></li>
+            <li><a href="/about" class="text-gray-600 hover:text-blue-600">À propos</a></li>
+            <li><a href="/services" class="text-gray-600 hover:text-blue-600">Services</a></li>
+            <li><a href="/e-books" class="text-gray-600 hover:text-blue-600">E-books</a></li>
+            <li><a href="/contact" class="text-gray-600 hover:text-blue-600">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Information -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact Us</h3>
+          <ul class="space-y-2">
+            <li class="text-gray-600">
+              <span class="block">Email:</span>
+              <a href="mailto:sabrina.bessieres@gmail.com" class="hover:text-blue-600">sabrina.bessieres@gmail.com</a>
+            </li>
+            <li class="text-gray-600">
+              <span class="block">Phone:</span>
+              <a href="tel:0661452241" class="hover:text-blue-600">06 61 45 22 41</a>
+            </li>
+            <li class="flex space-x-4 mt-4">
+              <a href="https://facebook.com" target="_blank" class="text-gray-600 hover:text-blue-600">
+                <span class="sr-only">Facebook</span>
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.77,7.46H14.5v-1.9c0-.9.6-1.1,1-1.1h3V.5L14.17.5C10.24.5,9.1,3.3,9.1,5.47V7.46H5.5v3.4h3.6V20.5h5.4V10.86h3.47l.44-3.4"/>
+                </svg>
+              </a>
+              <a href="https://linkedin.com" target="_blank" class="text-gray-600 hover:text-blue-600">
+                <span class="sr-only">LinkedIn</span>
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19,3H5C3.895,3,3,3.895,3,5v14c0,1.105,0.895,2,2,2h14c1.105,0,2-0.895,2-2V5C21,3.895,20.105,3,19,3z M9,17H6.477v-7H9 V17z M7.694,8.717c-0.771,0-1.286-0.514-1.286-1.2s0.514-1.2,1.371-1.2c0.771,0,1.286,0.514,1.286,1.2S8.551,8.717,7.694,8.717z M18,17h-2.442v-3.826c0-1.058-0.651-1.302-0.895-1.302s-1.058,0.163-1.058,1.302c0,0.163,0,3.826,0,3.826h-2.523v-7h2.523v0.977 C13.93,10.407,14.581,10,15.802,10C17.023,10,18,10.977,18,13.174V17z"/>
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Legal</h3>
+          <ul class="space-y-2">
+            <li><a href="/privacy" class="text-gray-600 hover:text-blue-600">Privacy Policy</a></li>
+            <li><a href="/terms" class="text-gray-600 hover:text-blue-600">Terms & Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <div class="border-t border-gray-200 mt-8 pt-8 text-center">
+        <p class="text-gray-600">&copy; 2025 Sabrina Bessières - All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

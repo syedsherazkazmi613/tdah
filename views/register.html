@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - ADHD Resources</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <link rel="shortcut icon" href="/img/tdh.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Add AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gray-50 font-['Manrope']">
+    <!-- Include your navigation here -->
+    
+    <main class="max-w-md mx-auto px-4 py-12">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden p-8" data-aos="fade-up">
+            <div class="text-center mb-8" data-aos="fade-up" data-aos-delay="100">
+                <h1 class="text-2xl font-bold text-gray-900">Create an Account</h1>
+                <p class="text-gray-600 mt-2">Join us to access e-books and resources</p>
+            </div>
+            
+            <form id="register-form" class="space-y-6" data-aos="fade-up" data-aos-delay="200">
+                <div id="error-message" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden"></div>
+                
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="name" name="name" required 
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" name="email" required 
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" name="password" required minlength="6"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <p class="mt-1 text-xs text-gray-500">Password must be at least 6 characters</p>
+                </div>
+                
+                <div>
+                    <button type="submit" 
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Register
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center" data-aos="fade-up" data-aos-delay="300">
+                <p class="text-sm text-gray-600">
+                    Already have an account? 
+                    <a href="/login" class="font-medium text-blue-600 hover:text-blue-500">
+                        Log in here
+                    </a>
+                </p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Add AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+            
+            try {
+                errorMessage.classList.add('hidden');
+                
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    errorMessage.textContent = data.error || 'Registration failed';
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+                
+                // Redirect on successful registration
+                window.location.href = data.redirect || '/';
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

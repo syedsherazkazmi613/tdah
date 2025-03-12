@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <title>Services de Coaching TDAH</title>
+    <link rel="shortcut icon" href="/img/tdh.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/output.css">
+
+    <!-- Add AOS library for scroll animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  </head>
+  <body>
+    <div class="min-h-screen overflow-x-hidden bg-gray-50 font-['Manrope']">
+      <nav class="bg-white shadow relative z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex">
+              <div class="flex-shrink-0 flex items-center">
+                <img class="h-24 w-auto" src="/img/tdh.png" alt="Logo" data-aos="fade-right">
+              </div>
+            </div>
+            <div class="flex items-center">
+              <!-- Bouton menu mobile -->
+              <button type="button" id="mobile-menu-button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100" aria-controls="mobile-menu" aria-expanded="false">
+                <span class="sr-only">Ouvrir le menu principal</span>
+                <!-- Menu ouvert: "hidden", Menu fermé: "block" -->
+                <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <!-- Navigation bureau -->
+              <div class="hidden md:ml-6 md:flex md:space-x-8" data-aos="fade-left">
+                <a href="/" class="text-[#f48225] px-3 py-2 text-sm font-medium">Accueil</a>
+                <a href="/about" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">À propos</a>
+                <a href="/services" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">Services</a>
+                <a href="/ebooks" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">E-books</a>
+                <a href="/contact" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">Contact</a>
+              </div>
+            </div>
+            <!-- Navigation authentification -->
+            <div id="auth-nav" class="hidden md:flex items-center ml-4" data-aos="fade-left" data-aos-delay="100">
+              <!-- Sera rempli par JavaScript -->
+              <div class="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu mobile -->
+        <div class="md:hidden" id="mobile-menu" style="display: none; opacity: 0; transform: translateY(-20px);">
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="/" class="block px-3 py-2 text-base font-medium text-[#f48225] bg-gray-50">Accueil</a>
+            <a href="/about" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">À propos</a>
+            <a href="/services" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Services</a>
+            <a href="/ebooks" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">E-books</a>
+            <a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Contact</a>
+          </div>
+          <!-- Navigation authentification mobile -->
+          <div id="mobile-auth-nav" class="px-2 pt-2 pb-3 border-t border-gray-200">
+            <!-- Sera rempli par JavaScript -->
+            <div class="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+          </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script>
+          // Initialize AOS
+          AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+          });
+
+          const menuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          let isMenuOpen = false;
+
+          menuButton.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            
+            if (isMenuOpen) {
+              // Afficher menu
+              mobileMenu.style.display = 'block';
+              gsap.to(mobileMenu, {
+                opacity: 1,
+                y: 0,
+                duration: 0.3,
+                ease: 'power2.out'
+              });
+            } else {
+              // Cacher menu
+              gsap.to(mobileMenu, {
+                opacity: 0,
+                y: -20,
+                duration: 0.3,
+                ease: 'power2.in',
+                onComplete: () => {
+                  mobileMenu.style.display = 'none';
+                }
+              });
+            }
+          });
+
+          // Récupérer le statut d'authentification et mettre à jour la navigation
+          fetch('/api/user')
+            .then(response => response.json())
+            .then(data => {
+              const authNav = document.getElementById('auth-nav');
+              const mobileAuthNav = document.getElementById('mobile-auth-nav');
+              
+              if (data.isAuthenticated) {
+                // Utilisateur connecté - Bureau
+                authNav.innerHTML = `
+                  <div class="flex items-center">
+                    <div class="relative" id="profile-dropdown-container" style="position: fixed; top: 1rem; right: 1rem;">
+                      <button id="profile-dropdown-button" class="flex items-center focus:outline-none">
+                        <img src="${data.profileImage}" alt="Profil" class="w-8 h-8 rounded-full border-2 border-blue-500">
+                        <span class="ml-2 text-sm font-medium text-gray-700">${data.name}</span>
+                        <svg class="ml-1 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </button>
+                      
+                      <div id="profile-dropdown-menu" class="fixed mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999] hidden">
+                        <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Votre Profil</a>
+                        <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Se déconnecter</a>
+                      </div>
+                    </div>
+                  </div>
+                `;
+
+                // Utilisateur connecté - Mobile
+                mobileAuthNav.innerHTML = `
+                  <div class="space-y-1">
+                    <span class="block px-3 py-2 text-base font-medium text-gray-700">${data.name}</span>
+                    <a href="/profile" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Votre Profil</a>
+                    <a href="/logout" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Se déconnecter</a>
+                  </div>
+                `;
+                
+                // Ajouter un écouteur d'événements pour basculer le menu déroulant
+                const dropdownButton = document.getElementById('profile-dropdown-button');
+                const dropdownMenu = document.getElementById('profile-dropdown-menu');
+                
+                dropdownButton.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  dropdownMenu.classList.toggle('hidden');
+                });
+                
+                // Fermer le menu déroulant en cliquant à l'extérieur
+                document.addEventListener('click', () => {
+                  dropdownMenu.classList.add('hidden');
+                });
+              } else {
+                // Utilisateur non connecté - Bureau
+                authNav.innerHTML = `
+                  <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-sm font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                    <a href="/register" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                      S'inscrire
+                    </a>
+                  </div>
+                `;
+
+                // Utilisateur non connecté - Mobile
+                mobileAuthNav.innerHTML = `
+                  <div class="space-y-1">
+                    <a href="/login" class="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                    <a href="/register" class="block px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">S'inscrire</a>
+                  </div>
+                `;
+              }
+            })
+            .catch(error => {
+              console.error('Erreur lors de la récupération des données utilisateur:', error);
+              // Retour aux liens de connexion/inscription - Bureau
+              document.getElementById('auth-nav').innerHTML = `
+                <div class="flex items-center space-x-4">
+                  <a href="/login" class="text-sm font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                  <a href="/register" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                    S'inscrire
+                  </a>
+                </div>
+              `;
+
+              // Retour aux liens de connexion/inscription - Mobile
+              document.getElementById('mobile-auth-nav').innerHTML = `
+                <div class="space-y-1">
+                  <a href="/login" class="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                  <a href="/register" class="block px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">S'inscrire</a>
+                </div>
+              `;
+            });
+        </script>
+      </nav>
+
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="space-y-12">
+          <!-- Section Héro -->
+          <div class="relative rounded-2xl overflow-hidden" data-aos="fade-up">
+            <div class="h-[60vh] md:h-[90vh] bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('/img/bg-1.jpg')">
+              <div class="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 max-w-[90%] sm:max-w-2xl p-4 sm:p-0">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight" data-aos="fade-up" data-aos-delay="200">Sabrina Bessières - Accompagnement des Parents d'Enfants TDAH</h1>
+                <p class="mt-2 text-xl sm:text-2xl font-bold text-white" data-aos="fade-up" data-aos-delay="400">"Quand on est parent et qu'on n'en peut plus !"</p>
+                <p class="mt-4 text-base sm:text-lg text-white" data-aos="fade-up" data-aos-delay="600">Coaching spécialisé pour aider les parents à gérer les défis uniques de l'éducation d'enfants TDAH. Ensemble, nous développerons des stratégies adaptées à votre famille.</p>
+                <button class="mt-4 sm:mt-6 px-6 sm:px-8 py-2 sm:py-3 bg-[#f48225] text-white rounded-lg font-semibold hover:bg-[#e67420] transition-colors text-sm sm:text-base" data-aos="fade-up" data-aos-delay="800">Réservez Votre Consultation Gratuite</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section À propos -->
+          <section class="bg-white rounded-xl shadow-lg p-8 relative overflow-hidden" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row items-center gap-8">
+              <div class="md:w-1/2" data-aos="fade-right">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Comprendre & Soutenir Votre Enfant TDAH</h2>
+                <p class="text-lg text-gray-600 mb-4">
+                  Être parent d'un enfant TDAH apporte des défis uniques - de la gestion des routines quotidiennes à la gestion des crises émotionnelles. Vous n'êtes pas seul dans ce parcours.
+                </p>
+                <p class="text-lg text-gray-600 mb-6">
+                  Grâce à un coaching personnalisé, nous vous aiderons à comprendre le cerveau de votre enfant TDAH, à développer des stratégies parentales efficaces et à créer un environnement favorable où votre enfant pourra s'épanouir.
+                </p>
+                <div class="space-y-4 mb-8">
+                  <div class="flex items-center" data-aos="fade-up" data-aos-delay="200">
+                    <svg class="h-6 w-6 text-[#f48225]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="ml-3 text-gray-700">Comprendre les comportements de votre enfant</span>
+                  </div>
+                  <div class="flex items-center" data-aos="fade-up" data-aos-delay="400">
+                    <svg class="h-6 w-6 text-[#f48225]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="ml-3 text-gray-700">Développer des stratégies parentales efficaces
+                    </span>
+                  </div>
+                  <div class="flex items-center" data-aos="fade-up" data-aos-delay="600">
+                    <svg class="h-6 w-6 text-[#f48225]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="ml-3 text-gray-700">Créer des routines adaptées</span>
+                  </div>
+                </div>
+                <a href="/services" class="inline-block bg-[#f48225] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#e67420] transition-colors" data-aos="fade-up" data-aos-delay="800">En Savoir Plus Sur Notre Coaching</a>
+              </div>
+              <div class="md:w-1/2" data-aos="fade-left">
+                <img src="/img/kids.jpg" alt="Parent soutenant un enfant TDAH" class="rounded-xl shadow-md w-full">
+              </div>
+            </div>
+          </section>
+
+          <!-- Caractéristiques -->
+          <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden" data-aos="fade-up">
+              <div class="aspect-square bg-cover" style="background-image: url('https://cdn.usegalileo.ai/sdxl10/8202fccb-3565-46ef-8bcd-c42bb1bdafb2.png')"></div>
+              <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900">Gestion du Temps</h3>
+                <p class="mt-2 text-gray-600">Apprenez des stratégies efficaces pour gérer votre temps et rester sur la bonne voie</p>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+              <div class="aspect-square bg-cover" style="background-image: url('https://cdn.usegalileo.ai/sdxl10/bb8f2da4-1435-4232-b4d3-176c7750a803.png')"></div>
+              <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900">Création de routines</h3>
+                <p class="mt-2 text-gray-600">Développer des routines durables qui soutiennent sa et votre réussite</p>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+              <div class="aspect-square bg-cover" style="background-image: url('https://cdn.usegalileo.ai/sdxl10/7d0b2b29-d831-4799-b68e-b00c5a2ef090.png')"></div>
+              <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900">Atteinte des Objectifs</h3>
+                <p class="mt-2 text-gray-600">Créez et exécutez des plans pour atteindre vos objectifs</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Tarifs -->
+          <!-- Banner -->
+          <div class="bg-gradient-to-r from-[#f48225] to-[#e67420] py-12 mb-16" data-aos="fade-up">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h1 class="text-4xl font-bold text-white mb-4">Nos Formules de Coaching TDAH</h1>
+              <p class="text-xl text-white/90 max-w-2xl mx-auto">Des solutions adaptées à chaque famille pour transformer les défis du TDAH en opportunités</p>
+            </div>
+          </div>
+
+          <section id="pricing" class="py-16 bg-gradient-to-br from-[#fff8f4] to-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Témoignages de Parents et d'Adultes TDAH</h2>
+                <p class="text-xl text-gray-600">Découvrez les expériences de ceux qui ont transformé leurs défis en succès</p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <h3 class="text-2xl font-bold text-gray-900 col-span-full mb-6">Témoignages des Parents</h3>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                  <div class="flex items-center mb-4">
+                    <img class="h-12 w-12 rounded-full" src="https://cdn.usegalileo.ai/sdxl10/3bcb4a13-a797-4480-b43d-dfe101c8ef09.png" alt="Djamila">
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold">Djamila</h4>
+                      <p class="text-gray-500">Maman de Nacer (8 ans)</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-600">"Avant de travailler avec Sabrina Bessières, j'étais complètement perdue face au TDAH de mon fils. Grâce à son accompagnement personnalisé, j'ai appris à comprendre ses besoins et à instaurer un quotidien plus serein. Merci pour votre soutien précieux !"</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                  <div class="flex items-center mb-4">
+                    <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8cmFuZG9tJTIwcGVvcGxlfGVufDB8fDB8fHww" alt="Marc">
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold">Marc</h4>
+                      <p class="text-gray-500">Papa de Clara (6 ans)</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-600">"Clara avait beaucoup de mal à se concentrer à l'école, et chaque journée était un défi. Grâce aux conseils de Sabrina, nous avons mis en place des stratégies adaptées à ses besoins. Aujourd'hui, Clara s'épanouit et notre maison est bien plus apaisée !"</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                  <div class="flex items-center mb-4">
+                    <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1525134479668-1bee5c7c6845?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Julie">
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold">Julie</h4>
+                      <p class="text-gray-500">Maman d'Emilien (10 ans)</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-600">"Je ne savais pas par où commencer pour aider Emilien, qui était constamment en crise. Le coaching m'a permis non seulement de mieux comprendre son fonctionnement mais aussi de renforcer notre relation. Il est plus épanoui, gère mieux ses émotions et progresse même à l'école !"</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                  <div class="flex items-center mb-4">
+                    <img class="h-12 w-12 rounded-full" src="https://plus.unsplash.com/premium_photo-1688891564708-9b2247085923?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8cmFuZG9tJTIwcGVvcGxlfGVufDB8fDB8fHww" alt="Amed">
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold">Amed</h4>
+                      <p class="text-gray-500">Papa de Mehdi (15 ans)</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-600">"Mehdi est un adolescent brillant, mais son TDAH l'entravait dans ses études et sa vie sociale. Grâce à l'accompagnement de Sabrina, nous avons mis en place des stratégies efficaces pour l'aider à mieux gérer ses impulsions et à se concentrer. Il a pris confiance en lui et nous aussi !"</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                  <div class="flex items-center mb-4">
+                    <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjR8fHJhbmRvbSUyMHBlb3BsZXxlbnwwfHwwfHx8MA%3D%3D" alt="Isabelle">
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold">Isabelle</h4>
+                      <p class="text-gray-500">Maman d'Alice (14 ans)</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-600">"L'adolescence a été très compliquée avec Alice. Elle avait du mal à se faire entendre à l'école et à la maison. Grâce au coaching, j'ai appris à poser des limites tout en étant bienveillante. Aujourd'hui, Alice a les outils pour mieux s'organiser et notre relation est beaucoup plus harmonieuse."</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <h3 class="text-2xl font-bold text-gray-900 col-span-full mb-6">Témoignages des Adultes</h3>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                  <div class="flex items-center mb-4">
+                    <img class="h-12 w-12 rounded-full" src="https://plus.unsplash.com/premium_photo-1689629870780-5d0e655383e6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTZ8fHJhbmRvbSUyMHBlb3BsZXxlbnwwfHwwfHx8MA%3D%3D" alt="David">
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold">David</h4>
+                      <p class="text-gray-500">35 ans</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-600">"J'ai été diagnostiqué TDAH adulte il y a quelques années, mais je ne savais pas comment le gérer. Sabrina m'a donné des outils pratiques pour mieux organiser mon temps, mes priorités et mes émotions. Aujourd'hui, je suis plus efficace au travail et mes relations personnelles se sont améliorées. Je ne pensais pas que cela pouvait changer autant ma vie !"</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                  <div class="flex items-center mb-4">
+                    <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTMxfHxyYW5kb20lMjBwZW9wbGV8ZW58MHx8MHx8fDA%3D" alt="Nathalie">
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold">Nathalie</h4>
+                      <p class="text-gray-500">42 ans</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-600">"En tant qu'adulte avec un TDAH, j'avais du mal à rester organisée et à trouver un équilibre dans ma vie. Les conseils et le coaching de Sabrina ont été une révélation. J'ai appris à mieux gérer mes impulsions, à améliorer ma concentration et surtout à ne plus culpabiliser de mes difficultés. Mon quotidien est désormais bien plus fluide et serein."</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Témoignages -->
+          <section class="py-12 bg-white">
+              <div class="mt-12 text-center">
+                <h3 class="text-2xl font-bold mb-6">L'objectif ?</h3>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Votre enfant ne se résume pas à sa pathologie. Vous pouvez l'aider à se révéler</p>
+                <div class="mt-8">
+                  <a href="/contact" class="inline-block bg-[#f48225] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#e67420] transition-colors">
+                    Commencez Votre Parcours
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Contact Form -->
+          <section id="contact" class="bg-gradient-to-br from-[#f8f4f1] to-white py-8 sm:py-16 px-4 sm:px-8 rounded-3xl">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-8 text-center">Commencez Votre Parcours de Coaching TDAH</h2>
+            <p class="text-gray-600 mb-6 sm:mb-8 text-center text-base sm:text-lg max-w-2xl mx-auto px-4">Faites le premier pas pour transformer les défis en opportunités. Partagez votre histoire avec nous et créons ensemble un changement positif.</p>
+            
+            <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm p-4 sm:p-8 hover:shadow-md transition-shadow duration-300">
+              <form id="contactForm" class="space-y-6 sm:space-y-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Nom</label>
+                    <input name="lastname" type="text" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 focus:border-[#f48225] focus:ring-2 focus:ring-[#f48225] focus:ring-opacity-20 transition-colors duration-200">
+                  </div>
+                  
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Prénom</label>
+                    <input name="firstname" type="text" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 focus:border-[#f48225] focus:ring-2 focus:ring-[#f48225] focus:ring-opacity-20 transition-colors duration-200">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Prénom de l'enfant</label>
+                    <input name="childName" type="text" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 focus:border-[#f48225] focus:ring-2 focus:ring-[#f48225] focus:ring-opacity-20 transition-colors duration-200">
+                  </div>
+                  
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Âge de l'enfant</label>
+                    <input name="childAge" type="number" min="0" max="18" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 focus:border-[#f48225] focus:ring-2 focus:ring-[#f48225] focus:ring-opacity-20 transition-colors duration-200">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
+                    <input name="phone" type="tel" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 focus:border-[#f48225] focus:ring-2 focus:ring-[#f48225] focus:ring-opacity-20 transition-colors duration-200">
+                  </div>
+                  
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input name="email" type="email" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 focus:border-[#f48225] focus:ring-2 focus:ring-[#f48225] focus:ring-opacity-20 transition-colors duration-200">
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">Votre message</label>
+                  <textarea name="message" rows="4" required placeholder="Partagez vos questions, préoccupations ou ce que vous espérez accomplir grâce au coaching..." class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-200 focus:border-[#f48225] focus:ring-2 focus:ring-[#f48225] focus:ring-opacity-20 transition-colors duration-200"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-[#f48225] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-[#e67420] transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl">
+                  Commencez votre parcours
+                </button>
+                
+                <div id="formStatus" class="hidden">
+                  <p id="successMessage" class="text-green-600 text-center font-medium hidden">Merci pour votre message! Nous vous contacterons bientôt.</p>
+                  <p id="errorMessage" class="text-red-600 text-center font-medium hidden">Une erreur s'est produite. Veuillez réessayer.</p>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- Footer -->
+        </div>
+      </main>
+      <footer class="bg-gray-100 mt-12 py-12 w-full">
+        <div class="max-w-6xl mx-auto px-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Quick Links -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
+              <ul class="space-y-2">
+                <li><a href="/" class="text-gray-600 hover:text-blue-600">Home</a></li>
+                <li><a href="/about" class="text-gray-600 hover:text-blue-600">About</a></li>
+                <li><a href="/services" class="text-gray-600 hover:text-blue-600">Services</a></li>
+                <li><a href="/e-books" class="text-gray-600 hover:text-blue-600">E-books</a></li>
+                <li><a href="/contact" class="text-gray-600 hover:text-blue-600">Contact</a></li>
+              </ul>
+            </div>
+
+            <!-- Contact Information -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact Us</h3>
+              <ul class="space-y-2">
+                <li class="text-gray-600">
+                  <span class="block">Email:</span>
+                  <a href="mailto:sabrina.bessieres@gmail.com" class="hover:text-blue-600">sabrina.bessieres@gmail.com</a>
+                </li>
+                <li class="text-gray-600">
+                  <span class="block">Phone:</span>
+                  <a href="tel:0661452241" class="hover:text-blue-600">06 61 45 22 41</a>
+                </li>
+                <li class="flex space-x-4 mt-4">
+                  <a href="https://facebook.com" target="_blank" class="text-gray-600 hover:text-blue-600">
+                    <span class="sr-only">Facebook</span>
+                    <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.77,7.46H14.5v-1.9c0-.9.6-1.1,1-1.1h3V.5L14.17.5C10.24.5,9.1,3.3,9.1,5.47V7.46H5.5v3.4h3.6V20.5h5.4V10.86h3.47l.44-3.4"/>
+                    </svg>
+                  </a>
+                  <a href="https://linkedin.com" target="_blank" class="text-gray-600 hover:text-blue-600">
+                    <span class="sr-only">LinkedIn</span>
+                    <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19,3H5C3.895,3,3,3.895,3,5v14c0,1.105,0.895,2,2,2h14c1.105,0,2-0.895,2-2V5C21,3.895,20.105,3,19,3z M9,17H6.477v-7H9 V17z M7.694,8.717c-0.771,0-1.286-0.514-1.286-1.2s0.514-1.2,1.371-1.2c0.771,0,1.286,0.514,1.286,1.2S8.551,8.717,7.694,8.717z M18,17h-2.442v-3.826c0-1.058-0.651-1.302-0.895-1.302s-1.058,0.163-1.058,1.302c0,0.163,0,3.826,0,3.826h-2.523v-7h2.523v0.977 C13.93,10.407,14.581,10,15.802,10C17.023,10,18,10.977,18,13.174V17z"/>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Legal -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Legal</h3>
+              <ul class="space-y-2">
+                <li><a href="/privacy" class="text-gray-600 hover:text-blue-600">Privacy Policy</a></li>
+                <li><a href="/terms" class="text-gray-600 hover:text-blue-600">Terms & Conditions</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Copyright -->
+          <div class="border-t border-gray-200 mt-8 pt-8 text-center">
+            <p class="text-gray-600">&copy; 2025 Sabrina Bessières - All Rights Reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
+        const formStatus = document.getElementById('formStatus');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        contactForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          // Reset status messages
+          formStatus.classList.add('hidden');
+          successMessage.classList.add('hidden');
+          errorMessage.classList.add('hidden');
+          
+          // Collect form data
+          const formData = new FormData(contactForm);
+          const formObject = {};
+          formData.forEach((value, key) => {
+            formObject[key] = value;
+          });
+          
+          try {
+            const response = await fetch('/api/contact', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formObject)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              // Show success message
+              formStatus.classList.remove('hidden');
+              successMessage.classList.remove('hidden');
+              contactForm.reset(); // Clear form
+            } else {
+              // Show error message
+              formStatus.classList.remove('hidden');
+              errorMessage.classList.remove('hidden');
+              errorMessage.textContent = data.message || 'Une erreur s\'est produite. Veuillez réessayer.';
+            }
+          } catch (error) {
+            console.error('Form submission error:', error);
+            formStatus.classList.remove('hidden');
+            errorMessage.classList.remove('hidden');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

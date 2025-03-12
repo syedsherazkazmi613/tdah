@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900"/>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <title>Sabrina Bessières - Coach TDAH</title>   
+    <link rel="shortcut icon" href="/img/tdh.png" type="image/x-icon">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div class="relative flex min-h-screen w-full flex-col bg-[#fcfaf8] overflow-x-hidden font-['Manrope']">
+      <div class="flex h-full grow flex-col">
+        <nav class="bg-white shadow">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+              <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                  <img class="h-24 w-auto" src="/img/tdh.png" alt="Logo">
+                </div>
+              </div>
+              <div class="flex items-center">
+                <!-- Bouton menu mobile -->
+                <button type="button" id="mobile-menu-button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100" aria-controls="mobile-menu" aria-expanded="false">
+                  <span class="sr-only">Ouvrir le menu principal</span>
+                  <!-- Menu ouvert: "hidden", Menu fermé: "block" -->
+                  <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+                <!-- Navigation bureau -->
+                <div class="hidden md:ml-6 md:flex md:space-x-8">
+                  <a href="/" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">Accueil</a>
+                  <a href="/about" class="text-[#f48225] px-3 py-2 text-sm font-medium">À propos</a>
+                  <a href="/services" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">Services</a>
+                  <a href="/ebooks" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">E-books</a>
+                  <a href="/contact" class="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">Contact</a>
+                </div>
+              </div>
+              <!-- Navigation authentification -->
+              <div id="auth-nav" class="hidden md:flex items-center ml-4">
+                <!-- Sera rempli par JavaScript -->
+                <div class="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Menu mobile -->
+          <div class="md:hidden" id="mobile-menu" style="display: none; opacity: 0; transform: translateY(-20px);">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+              <a href="/" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Accueil</a>
+              <a href="/about" class="block px-3 py-2 text-base font-medium text-[#f48225] bg-gray-50">À propos</a>
+              <a href="/services" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Services</a>
+              <a href="/ebooks" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">E-books</a>
+              <a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Contact</a>
+            </div>
+            <!-- Navigation authentification mobile -->
+            <div id="mobile-auth-nav" class="px-2 pt-2 pb-3 border-t border-gray-200">
+              <!-- Sera rempli par JavaScript -->
+              <div class="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+            </div>
+          </div>
+  
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+          <script>
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            let isMenuOpen = false;
+  
+            menuButton.addEventListener('click', () => {
+              isMenuOpen = !isMenuOpen;
+              
+              if (isMenuOpen) {
+                // Afficher menu
+                mobileMenu.style.display = 'block';
+                gsap.to(mobileMenu, {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.3,
+                  ease: 'power2.out'
+                });
+              } else {
+                // Cacher menu
+                gsap.to(mobileMenu, {
+                  opacity: 0,
+                  y: -20,
+                  duration: 0.3,
+                  ease: 'power2.in',
+                  onComplete: () => {
+                    mobileMenu.style.display = 'none';
+                  }
+                });
+              }
+            });
+  
+            // Récupérer le statut d'authentification et mettre à jour la navigation
+            fetch('/api/user')
+              .then(response => response.json())
+              .then(data => {
+                const authNav = document.getElementById('auth-nav');
+                const mobileAuthNav = document.getElementById('mobile-auth-nav');
+                
+                if (data.isAuthenticated) {
+                  // Utilisateur connecté - Bureau
+                  authNav.innerHTML = `
+                    <div class="flex items-center">
+                      <div class="relative" id="profile-dropdown-container">
+                        <button id="profile-dropdown-button" class="flex items-center focus:outline-none">
+                          <img src="${data.profileImage}" alt="Profil" class="w-8 h-8 rounded-full border-2 border-blue-500">
+                          <span class="ml-2 text-sm font-medium text-gray-700">${data.name}</span>
+                          <svg class="ml-1 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                          </svg>
+                        </button>
+                        
+                        <div id="profile-dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden">
+                          <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Votre Profil</a>
+                          <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Se déconnecter</a>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+  
+                  // Utilisateur connecté - Mobile
+                  mobileAuthNav.innerHTML = `
+                    <div class="space-y-1">
+                      <span class="block px-3 py-2 text-base font-medium text-gray-700">${data.name}</span>
+                      <a href="/profile" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Votre Profil</a>
+                      <a href="/logout" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Se déconnecter</a>
+                    </div>
+                  `;
+                  
+                  // Ajouter un écouteur d'événements pour basculer le menu déroulant
+                  const dropdownButton = document.getElementById('profile-dropdown-button');
+                  const dropdownMenu = document.getElementById('profile-dropdown-menu');
+                  
+                  dropdownButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle('hidden');
+                  });
+                  
+                  // Fermer le menu déroulant en cliquant à l'extérieur
+                  document.addEventListener('click', () => {
+                    dropdownMenu.classList.add('hidden');
+                  });
+                } else {
+                  // Utilisateur non connecté - Bureau
+                  authNav.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                      <a href="/login" class="text-sm font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                      <a href="/register" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        S'inscrire
+                      </a>
+                    </div>
+                  `;
+  
+                  // Utilisateur non connecté - Mobile
+                  mobileAuthNav.innerHTML = `
+                    <div class="space-y-1">
+                      <a href="/login" class="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                      <a href="/register" class="block px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">S'inscrire</a>
+                    </div>
+                  `;
+                }
+              })
+              .catch(error => {
+                console.error('Erreur lors de la récupération des données utilisateur:', error);
+                // Solution de repli vers liens connexion/inscription - Bureau
+                document.getElementById('auth-nav').innerHTML = `
+                  <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-sm font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                    <a href="/register" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                      S'inscrire
+                    </a>
+                  </div>
+                `;
+  
+                // Solution de repli vers liens connexion/inscription - Mobile
+                document.getElementById('mobile-auth-nav').innerHTML = `
+                  <div class="space-y-1">
+                    <a href="/login" class="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-500">Se connecter</a>
+                    <a href="/register" class="block px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">S'inscrire</a>
+                  </div>
+                `;
+              });
+          </script>
+        </nav>
+        <main class="flex-1">
+          <!-- Section Héros -->
+          <section class="relative min-h-[80vh] md:h-screen">
+            <div class="absolute inset-0">
+              <img src="/img/bg.jpeg" alt="Arrière-plan" class="w-full h-full object-cover opacity-30">
+            </div>
+            <div class="relative h-full flex items-center py-12 md:py-0">
+              <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div class="w-full md:w-1/2 text-center" data-aos="fade-right">
+                    <img src="/img/sabrina.jpg" alt="Sabrina Bessières" class="rounded-full w-48 h-48 md:w-64 md:h-64 object-cover mx-auto shadow-xl">
+                  </div>
+                  <div class="w-full md:w-1/2 text-center md:text-left" data-aos="fade-left">
+                    <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold mb-6">Sabrina Bessières</h1>
+                    <p class="text-lg sm:text-xl md:text-2xl text-gray-800">Maman d'un enfant TDAH et moi-même adulte TDAH, j'ai appris à adapter ma vie pour transformer ces défis en opportunités.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Contenu Principal -->
+          <section class="py-12 md:py-16 bg-white">
+            <div class="container mx-auto px-4">
+              <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center" data-aos="fade-up">Mais que faire lorsque l'on découvre tout juste que son enfant vit avec le TDAH ?</h2>
+                
+                <div class="prose prose-lg mx-auto px-4">
+                  <p class="mb-6" data-aos="fade-up" data-aos-delay="100">Ce terme peut faire peur. Un "trouble" souvent associé à des échecs et des limitations... Mais pourquoi continuer à le voir comme une contrainte ? Le TDAH n'est pas une faiblesse, c'est une différence, un défi à transformer en force. Et je suis là pour vous montrer comment.</p>
+                  
+                  <p class="mb-6" data-aos="fade-up" data-aos-delay="200">Oui, ce parcours est semé d'embûches. Parfois, malgré toute notre volonté, on se sent désemparé, comme si chaque journée était une lutte. Mais vous n'êtes pas seuls. Bien sûr, vous aimez profondément votre enfant, mais le quotidien est complexe. Les incompréhensions, les conflits, l'organisation… Il est normal de se sentir perdu.</p>
+                  
+                  <p class="mb-6" data-aos="fade-up" data-aos-delay="300">Ce dont vous avez vraiment besoin, ce sont des solutions concrètes, des stratégies pratiques et un accompagnement personnalisé pour remettre de l'ordre et retrouver la sérénité dans votre famille.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section Approche -->
+          <section class="py-12 md:py-16 bg-[#f8f4f1]">
+            <div class="container mx-auto px-4">
+              <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center" data-aos="fade-up">Mon Approche</h2>
+                
+                <div class="prose prose-lg mx-auto px-4">
+                  <p class="mb-6" data-aos="fade-up" data-aos-delay="100">Aider votre enfant, c'est d'abord vous aider vous-même. Même s'il n'est pas physiquement présent, il sera au cœur de chaque étape de notre accompagnement.</p>
+                  
+                  <p class="mb-6" data-aos="fade-up" data-aos-delay="200">Grâce à mon expertise, vous recevrez des outils adaptés et des méthodologies efficaces pour comprendre les besoins de votre enfant et transformer ces défis en solutions. Ce parcours, c'est un travail d'équipe, une équipe qui commence avec vous, pour créer un environnement apaisé et harmonieux pour toute la famille.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Appel à l'Action -->
+          <section class="py-12 md:py-16 bg-white">
+            <div class="container mx-auto px-4 text-center">
+              <h2 class="text-2xl md:text-3xl font-bold mb-6" data-aos="fade-up">L'objectif ?</h2>
+              <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto px-4" data-aos="fade-up" data-aos-delay="100">Révéler le potentiel unique de votre enfant, sans le laisser enfermer dans une étiquette. Si vous êtes prêts à changer votre quotidien, je suis là pour vous guider, étape par étape.</p>
+              
+              <a href="/contact" class="inline-block bg-[#f48225] text-[#1c140d] px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-[#e67420] transition-colors" data-aos="zoom-in" data-aos-delay="200">
+                Commencez votre parcours
+              </a>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <footer class="bg-gray-100 mt-12 py-12 w-full">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Liens Rapides -->
+          <div data-aos="fade-up">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Liens Rapides</h3>
+            <ul class="space-y-2">
+              <li><a href="/" class="text-gray-600 hover:text-blue-600">Accueil</a></li>
+              <li><a href="/about" class="text-gray-600 hover:text-blue-600">À propos</a></li>
+              <li><a href="/services" class="text-gray-600 hover:text-blue-600">Services</a></li>
+              <li><a href="/e-books" class="text-gray-600 hover:text-blue-600">E-books</a></li>
+              <li><a href="/contact" class="text-gray-600 hover:text-blue-600">Contact</a></li>
+            </ul>
+          </div>
+
+          <!-- Informations de Contact -->
+          <div data-aos="fade-up" data-aos-delay="100">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Contactez-nous</h3>
+            <ul class="space-y-2">
+              <li class="text-gray-600">
+                <span class="block">Email :</span>
+                <a href="mailto:sabrina.bessieres@gmail.com" class="hover:text-blue-600">sabrina.bessieres@gmail.com</a>
+              </li>
+              <li class="text-gray-600">
+                <span class="block">Téléphone :</span>
+                <a href="tel:0661452241" class="hover:text-blue-600">06 61 45 22 41</a>
+              </li>
+              <li class="flex space-x-4 mt-4">
+                <a href="https://facebook.com" target="_blank" class="text-gray-600 hover:text-blue-600">
+                  <span class="sr-only">Facebook</span>
+                  <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.77,7.46H14.5v-1.9c0-.9.6-1.1,1-1.1h3V.5L14.17.5C10.24.5,9.1,3.3,9.1,5.47V7.46H5.5v3.4h3.6V20.5h5.4V10.86h3.47l.44-3.4"/>
+                  </svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="text-gray-600 hover:text-blue-600">
+                  <span class="sr-only">LinkedIn</span>
+                  <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19,3H5C3.895,3,3,3.895,3,5v14c0,1.105,0.895,2,2,2h14c1.105,0,2-0.895,2-2V5C21,3.895,20.105,3,19,3z M9,17H6.477v-7H9 V17z M7.694,8.717c-0.771,0-1.286-0.514-1.286-1.2s0.514-1.2,1.371-1.2c0.771,0,1.286,0.514,1.286,1.2S8.551,8.717,7.694,8.717z M18,17h-2.442v-3.826c0-1.058-0.651-1.302-0.895-1.302s-1.058,0.163-1.058,1.302c0,0.163,0,3.826,0,3.826h-2.523v-7h2.523v0.977 C13.93,10.407,14.581,10,15.802,10C17.023,10,18,10.977,18,13.174V17z"/>
+                  </svg>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Mentions Légales -->
+          <div data-aos="fade-up" data-aos-delay="200">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Mentions Légales</h3>
+            <ul class="space-y-2">
+              <li><a href="/privacy" class="text-gray-600 hover:text-blue-600">Politique de Confidentialité</a></li>
+              <li><a href="/terms" class="text-gray-600 hover:text-blue-600">Conditions Générales</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="border-t border-gray-200 mt-8 pt-8 text-center" data-aos="fade-up" data-aos-delay="300">
+          <p class="text-gray-600">&copy; 2025 Sabrina Bessières - Tous droits réservés.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50
+      });
+    </script>
+  </body>
+</html>

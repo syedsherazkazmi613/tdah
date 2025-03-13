@@ -13,9 +13,6 @@ yarn-error.log
 .env.test.local
 .env.production.local
 
-# E-books and PDF files
-pdfs/
-*.pdf
 
 # Log files
 logs/
